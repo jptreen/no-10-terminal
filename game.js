@@ -162,13 +162,14 @@ async function endGame(command) {
 
 async function continueGame(command, response) {
   const cleanCommand = command.trim() || "[silence]";
-  appendCommandEcho(cleanCommand);
   input.disabled = true;
   commandSubmit.hidden = true;
   isPrinting = true;
   input.blur();
-  await typeLine(response, "verdict");
   input.value = "";
+  form.remove();
+  appendCommandEcho(cleanCommand);
+  await typeLine(response, "verdict");
   input.disabled = false;
   isPrinting = false;
   extraPromptUsed = true;
