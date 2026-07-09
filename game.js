@@ -1,10 +1,9 @@
 const RESPONSES = [
   "The 2,000 voters in Nuneaton willing to consider both Labour and Conservative have decided they don't like your housing policy, and because of First Past the Post they are important, but the million adults who would like to move out of their childhood bedroom are not.\n\nI'm sorry, Prime Minister, but the lectern is ready for your resignation speech now, so is Steve Bray.",
   "The Electoral Commission return shows that nearly one pound in four of reported party donations came from one individual. The Chief Whip says it would be unwise to confuse a democratic mandate with party funding, particularly when the donor has asked for another Prime Minister.",
-  "A dozen MPs in southern marginals have told the Chief Whip that 150,000 social-rent homes a year is admirable everywhere except within twenty miles of their constituencies. The landowners, planning committees and local papers are agreed that the national target is important, provided the houses remain elsewhere.",
   "The Treasury has classified the National Housing Bank as a cost before anyone at the OBR has been allowed to treat the homes as assets. Planning permission for your political legacy has been denied.",
-  "Council tax rates were last revalued in 1991. It might be unfair, but it is a British tradition. While drafting your resignation letter, you realise you shouldn't have tried to fix things. Fixing things never works.",
-  "A wealth tax is supported by the country at large, and indeed by most millionaires. But polls are vanity, donor cheques are reality. As another MP calls for your resignation, you wonder why did you even bother?",
+  "Council tax rates have not been revalued since 1991. While drafting your resignation letter, you realise you shouldn't have tried to fix things. Fixing things never works.",
+  "A wealth tax is supported by the country at large, and indeed by most millionaires. But polls are vanity, donor cheques are reality. As the election looms, another MP calls for your resignation, you wonder why did you even bother?",
   "The local paper that used to cover the planning committee closed three years ago. Compulsory purchase orders are now a culture-war story on Facebook. These problems didn't end your premiership, but in these final moments you wonder whether looking into this instead of whatever the focus groups suggested might at least have been useful.",
   "57.8 per cent of voters did not vote for their MP. No wonder you couldn't build any trust in the system during your limited time in office."
 ];
