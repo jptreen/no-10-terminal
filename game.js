@@ -23,6 +23,7 @@ const input = document.querySelector("#command-input");
 const commandSubmit = document.querySelector("#command-submit");
 const betterLink = document.querySelector("#better-link");
 
+const RESPONSE_STORAGE_KEY = "no10-terminal-next-response-index";
 const TYPEWRITER_CHARACTERS_PER_SECOND = 100;
 const TYPEWRITER_SCROLL_INTERVAL = 125;
 
@@ -30,6 +31,7 @@ let gameOver = false;
 let extraPromptUsed = false;
 let isPrinting = false;
 let restartReady = false;
+let fallbackResponseIndex = 0;
 
 function focusCommandInput() {
   if (input.disabled) {
@@ -165,17 +167,67 @@ function getSpecialResponse(command) {
   return "";
 }
 
+function normaliseResponseIndex(index) {
+  if (Number.isInteger(index) && index >= 0 && index < RESPONSES.length) {
+    return index;
+  }
+
+  return 0;
+}
+
+function removeStoredResponseIndex() {
+  fallbackResponseIndex = 0;
+
+  try {
+    window.localStorage.removeItem(RESPONSE_STORAGE_KEY);
+  } catch {
+    // Private browsing or file permissions can make storage unavailable.
+  }
+}
+
+function getStoredResponseIndex() {
+  try {
+    const storedValue = window.localStorage.getItem(RESPONSE_STORAGE_KEY);
+    const storedIndex = storedValue === null ? NaN : Number(storedValue);
+
+    if (Number.isInteger(storedIndex) && storedIndex >= 0 && storedIndex < RESPONSES.length) {
+      return storedIndex;
+    }
+
+    window.localStorage.removeItem(RESPONSE_STORAGE_KEY);
+  } catch {
+    return normaliseResponseIndex(fallbackResponseIndex);
+  }
+
+  return normaliseResponseIndex(fallbackResponseIndex);
+}
+
+function storeNextResponseIndex(index) {
+  const nextIndex = index + 1;
+
+  if (nextIndex >= RESPONSES.length) {
+    removeStoredResponseIndex();
+    return;
+  }
+
+  fallbackResponseIndex = nextIndex;
+
+  try {
+    window.localStorage.setItem(RESPONSE_STORAGE_KEY, String(nextIndex));
+  } catch {
+    // The in-memory fallback still keeps the session moving in order.
+  }
+}
+
 function pickResponse() {
-  if (RESPONSES.length === 1) {
-    return RESPONSES[0];
+  if (RESPONSES.length === 0) {
+    return "";
   }
 
-  if (Math.random() < 1 / 3) {
-    return RESPONSES[0];
-  }
-
-  const remainingIndex = 1 + Math.floor(Math.random() * (RESPONSES.length - 1));
-  return RESPONSES[remainingIndex];
+  const responseIndex = getStoredResponseIndex();
+  const response = RESPONSES[responseIndex];
+  storeNextResponseIndex(responseIndex);
+  return response;
 }
 
 async function endGame(command) {
