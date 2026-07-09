@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>No. 10 Terminal</title>
+    <link rel="icon" href="assets/no10-terminal.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <main class="shell" aria-label="No. 10 terminal adventure">
+      <section class="terminal" aria-label="No. 10 terminal">
+        <div class="screen" id="screen" aria-live="polite">
+          <p>You are Prime Minister</p>
+          <p>You're sitting at your desk in No. 10.</p>
+          <p>The red box is open. A policy paper has escaped its folder.</p>
+          <p>What do you do?</p>
+
+          <form class="command" id="command-form" autocomplete="off">
+            <input
+              id="command-input"
+              name="command"
+              type="text"
+              aria-label="Your action"
+              spellcheck="false"
+              autocomplete="off"
+              autofocus
+            >
+          </form>
+        </div>
+        <a
+          class="better-link"
+          id="better-link"
+          href="https://www.gov.uk/government/organisations/prime-ministers-office-10-downing-street"
+          target="_blank"
+          rel="noopener noreferrer"
+          hidden
+        >Why can't we do better than this?</a>
+      </section>
+    </main>
+
+    <script src="game.js"></script>
+  </body>
+</html>
