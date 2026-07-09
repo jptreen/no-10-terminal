@@ -14,17 +14,33 @@ const XYZZY_RESPONSE = "Nothing happens.";
 const screen = document.querySelector("#screen");
 const form = document.querySelector("#command-form");
 const input = document.querySelector("#command-input");
+const commandSubmit = document.querySelector("#command-submit");
 const betterLink = document.querySelector("#better-link");
+
+const TYPEWRITER_CHARACTERS_PER_SECOND = 20;
+const TYPEWRITER_DELAY = 1000 / TYPEWRITER_CHARACTERS_PER_SECOND;
 
 let gameOver = false;
 let extraPromptUsed = false;
+let isPrinting = false;
+let restartReady = false;
+
+function sleep(ms) {
+  return new Promise((resolve) => {
+    setTimeout(resolve, ms);
+  });
+}
 
 function focusCommandInput() {
   if (input.disabled) {
     return;
   }
 
-  input.focus({ preventScroll: true });
+  try {
+    input.focus({ preventScroll: true });
+  } catch {
+    input.focus();
+  }
 }
 
 function isInteractiveTarget(target) {
@@ -45,15 +61,36 @@ function scrollIntoView(element) {
   }
 }
 
-function appendLine(text, className) {
+function updateCommandSubmit() {
+  commandSubmit.hidden = input.disabled || document.activeElement === input || input.value.trim() === "";
+}
+
+function appendBlankLine(className) {
   const line = document.createElement("p");
-  line.textContent = text;
 
   if (className) {
     line.className = className;
   }
 
   screen.append(line);
+  return line;
+}
+
+function appendLine(text, className) {
+  const line = appendBlankLine(className);
+  line.textContent = text;
+  return line;
+}
+
+async function typeLine(text, className) {
+  const line = appendBlankLine(className);
+
+  for (const character of text) {
+    line.textContent += character;
+    scrollIntoView(line);
+    await sleep(TYPEWRITER_DELAY);
+  }
+
   return line;
 }
 
@@ -98,28 +135,37 @@ function pickResponse() {
   return RESPONSES[remainingIndex];
 }
 
-function endGame(command) {
+async function endGame(command) {
   const cleanCommand = command.trim() || "[silence]";
   input.value = cleanCommand;
-  appendLine(pickResponse(), "verdict");
-  appendLine("GAME OVER", "game-over");
-  const restartHint = appendLine("Press Any Key to Pay Again", "restart-hint cursor");
-  betterLink.hidden = false;
 
   gameOver = true;
+  restartReady = false;
+  isPrinting = true;
   input.disabled = true;
+  commandSubmit.hidden = true;
   input.blur();
+  await typeLine(pickResponse(), "verdict");
+  await typeLine("GAME OVER", "game-over");
+  const restartHint = await typeLine("Press Any Key to Pay Again", "restart-hint cursor");
+  betterLink.hidden = false;
+  isPrinting = false;
+  restartReady = true;
   scrollIntoView(restartHint);
 }
 
-function continueGame(command, response) {
+async function continueGame(command, response) {
   const cleanCommand = command.trim() || "[silence]";
   appendCommandEcho(cleanCommand);
-  appendLine(response, "verdict");
-  screen.append(form);
-
+  input.disabled = true;
+  commandSubmit.hidden = true;
+  isPrinting = true;
+  await typeLine(response, "verdict");
   input.value = "";
+  input.disabled = false;
+  isPrinting = false;
   extraPromptUsed = true;
+  screen.append(form);
   focusCommandInput();
   scrollIntoView(form);
 }
@@ -134,15 +180,18 @@ function resetGame() {
 
   input.value = "";
   input.disabled = false;
+  commandSubmit.hidden = true;
   betterLink.hidden = true;
   gameOver = false;
   extraPromptUsed = false;
+  isPrinting = false;
+  restartReady = false;
   focusCommandInput();
   scrollIntoView(form);
 }
 
 function submitCommand() {
-  if (input.disabled) {
+  if (input.disabled || isPrinting) {
     return;
   }
 
@@ -174,16 +223,18 @@ document.addEventListener("click", (event) => {
     return;
   }
 
-  if (gameOver) {
+  if (gameOver && restartReady) {
     resetGame();
     return;
   }
 
-  focusCommandInput();
+  if (!gameOver) {
+    focusCommandInput();
+  }
 });
 
 document.addEventListener("keydown", (event) => {
-  if (!gameOver) {
+  if (!gameOver || !restartReady) {
     return;
   }
 
@@ -212,5 +263,9 @@ betterLink.addEventListener("click", (event) => {
     event.preventDefault();
   }
 });
+
+input.addEventListener("input", updateCommandSubmit);
+input.addEventListener("focus", updateCommandSubmit);
+input.addEventListener("blur", updateCommandSubmit);
 
 focusCommandInput();

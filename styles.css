@@ -79,6 +79,7 @@ body::before {
 
 .screen p {
   margin: 0 0 14px;
+  white-space: pre-wrap;
 }
 
 .screen p:last-child {
@@ -116,7 +117,7 @@ body::before {
 
 .command {
   display: grid;
-  grid-template-columns: auto minmax(0, 1fr);
+  grid-template-columns: auto minmax(0, 1fr) auto;
   column-gap: 8px;
   align-items: center;
   margin: 0 0 14px;
@@ -143,6 +144,22 @@ body::before {
 
 .command input:focus {
   box-shadow: none;
+}
+
+.command-submit {
+  border: 1px solid var(--line);
+  border-radius: 0;
+  padding: 0 8px;
+  background: transparent;
+  color: var(--paper);
+  cursor: pointer;
+  font: inherit;
+}
+
+.command-submit:focus,
+.command-submit:hover {
+  outline: 1px solid var(--phosphor);
+  outline-offset: 3px;
 }
 
 .better-link {
