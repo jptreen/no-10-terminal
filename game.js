@@ -24,18 +24,12 @@ const commandSubmit = document.querySelector("#command-submit");
 const betterLink = document.querySelector("#better-link");
 
 const TYPEWRITER_CHARACTERS_PER_SECOND = 100;
-const TYPEWRITER_DELAY = 1000 / TYPEWRITER_CHARACTERS_PER_SECOND;
+const TYPEWRITER_SCROLL_INTERVAL = 125;
 
 let gameOver = false;
 let extraPromptUsed = false;
 let isPrinting = false;
 let restartReady = false;
-
-function sleep(ms) {
-  return new Promise((resolve) => {
-    setTimeout(resolve, ms);
-  });
-}
 
 function focusCommandInput() {
   if (input.disabled) {
@@ -88,16 +82,59 @@ function appendLine(text, className) {
   return line;
 }
 
-async function typeLine(text, className) {
-  const line = appendBlankLine(className);
-
-  for (const character of text) {
-    line.textContent += character;
-    scrollIntoView(line);
-    await sleep(TYPEWRITER_DELAY);
+function getAnimationTime() {
+  if (typeof performance !== "undefined" && typeof performance.now === "function") {
+    return performance.now();
   }
 
-  return line;
+  return Date.now();
+}
+
+function requestAnimationTick(callback) {
+  if (typeof requestAnimationFrame === "function") {
+    requestAnimationFrame(callback);
+    return;
+  }
+
+  setTimeout(() => callback(getAnimationTime()), 16);
+}
+
+function typeLine(text, className) {
+  const line = appendBlankLine(className);
+  const startedAt = getAnimationTime();
+  let lastLength = 0;
+  let lastScrollAt = 0;
+
+  return new Promise((resolve) => {
+    const tick = (timestamp) => {
+      const now = typeof timestamp === "number" ? timestamp : getAnimationTime();
+      const elapsedSeconds = Math.max(0, (now - startedAt) / 1000);
+      const nextLength = Math.min(
+        text.length,
+        Math.floor(elapsedSeconds * TYPEWRITER_CHARACTERS_PER_SECOND)
+      );
+
+      if (nextLength !== lastLength) {
+        line.textContent = text.slice(0, nextLength);
+        lastLength = nextLength;
+      }
+
+      if (now - lastScrollAt >= TYPEWRITER_SCROLL_INTERVAL || nextLength === text.length) {
+        scrollIntoView(line);
+        lastScrollAt = now;
+      }
+
+      if (nextLength >= text.length) {
+        line.textContent = text;
+        resolve(line);
+        return;
+      }
+
+      requestAnimationTick(tick);
+    };
+
+    requestAnimationTick(tick);
+  });
 }
 
 function appendCommandEcho(text) {
