@@ -17,7 +17,7 @@ const input = document.querySelector("#command-input");
 const commandSubmit = document.querySelector("#command-submit");
 const betterLink = document.querySelector("#better-link");
 
-const TYPEWRITER_CHARACTERS_PER_SECOND = 20;
+const TYPEWRITER_CHARACTERS_PER_SECOND = 80;
 const TYPEWRITER_DELAY = 1000 / TYPEWRITER_CHARACTERS_PER_SECOND;
 
 let gameOver = false;
