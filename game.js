@@ -10,6 +10,12 @@ const RESPONSES = [
 
 const LOOK_RESPONSE = "You are in a large dark paneled room sitting at an oak desk with a red box sitting open on top of it. To the far end of the room is a door and to your left there is a window.";
 const XYZZY_RESPONSE = "Nothing happens.";
+const INITIAL_LINES = [
+  "You are Prime Minister",
+  "You're sitting at your desk in No. 10.",
+  "The red box is open. A policy paper has escaped its folder.",
+  "What do you do?"
+];
 
 const screen = document.querySelector("#screen");
 const form = document.querySelector("#command-form");
@@ -17,7 +23,7 @@ const input = document.querySelector("#command-input");
 const commandSubmit = document.querySelector("#command-submit");
 const betterLink = document.querySelector("#better-link");
 
-const TYPEWRITER_CHARACTERS_PER_SECOND = 80;
+const TYPEWRITER_CHARACTERS_PER_SECOND = 100;
 const TYPEWRITER_DELAY = 1000 / TYPEWRITER_CHARACTERS_PER_SECOND;
 
 let gameOver = false;
@@ -160,6 +166,7 @@ async function continueGame(command, response) {
   input.disabled = true;
   commandSubmit.hidden = true;
   isPrinting = true;
+  input.blur();
   await typeLine(response, "verdict");
   input.value = "";
   input.disabled = false;
@@ -170,24 +177,32 @@ async function continueGame(command, response) {
   scrollIntoView(form);
 }
 
-function resetGame() {
+async function startGame() {
   screen.replaceChildren();
-  appendLine("You are Prime Minister");
-  appendLine("You're sitting at your desk in No. 10.");
-  appendLine("The red box is open. A policy paper has escaped its folder.");
-  appendLine("What do you do?");
-  screen.append(form);
-
   input.value = "";
-  input.disabled = false;
   commandSubmit.hidden = true;
   betterLink.hidden = true;
   gameOver = false;
   extraPromptUsed = false;
-  isPrinting = false;
+  isPrinting = true;
   restartReady = false;
+
+  input.disabled = true;
+  input.blur();
+
+  for (const line of INITIAL_LINES) {
+    await typeLine(line);
+  }
+
+  screen.append(form);
+  input.disabled = false;
+  isPrinting = false;
   focusCommandInput();
   scrollIntoView(form);
+}
+
+function resetGame() {
+  startGame();
 }
 
 function submitCommand() {
@@ -268,4 +283,4 @@ input.addEventListener("input", updateCommandSubmit);
 input.addEventListener("focus", updateCommandSubmit);
 input.addEventListener("blur", updateCommandSubmit);
 
-focusCommandInput();
+startGame();
