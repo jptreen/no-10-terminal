@@ -28,6 +28,24 @@ function focusCommandInput() {
   input.focus({ preventScroll: true });
 }
 
+function isInteractiveTarget(target) {
+  return Boolean(target && typeof target.closest === "function" && target.closest("a, button, textarea, select"));
+}
+
+function scrollIntoView(element) {
+  const scroll = () => {
+    if (typeof element.scrollIntoView === "function") {
+      element.scrollIntoView({ block: "nearest", inline: "nearest" });
+    }
+  };
+
+  if (typeof requestAnimationFrame === "function") {
+    requestAnimationFrame(scroll);
+  } else {
+    scroll();
+  }
+}
+
 function appendLine(text, className) {
   const line = document.createElement("p");
   line.textContent = text;
@@ -86,12 +104,13 @@ function endGame(command) {
   input.value = cleanCommand;
   appendLine(pickResponse(), "verdict");
   appendLine("GAME OVER", "game-over");
-  appendLine("Press Any Key to Pay Again", "restart-hint cursor");
+  const restartHint = appendLine("Press Any Key to Pay Again", "restart-hint cursor");
   betterLink.hidden = false;
 
   gameOver = true;
   input.disabled = true;
   input.blur();
+  scrollIntoView(restartHint);
 }
 
 function continueGame(command, response) {
@@ -103,6 +122,7 @@ function continueGame(command, response) {
   input.value = "";
   extraPromptUsed = true;
   focusCommandInput();
+  scrollIntoView(form);
 }
 
 function resetGame() {
@@ -119,6 +139,7 @@ function resetGame() {
   gameOver = false;
   extraPromptUsed = false;
   focusCommandInput();
+  scrollIntoView(form);
 }
 
 function submitCommand() {
@@ -150,7 +171,12 @@ input.addEventListener("keydown", (event) => {
 });
 
 document.addEventListener("click", (event) => {
-  if (gameOver || event.target.closest("a, button, textarea, select")) {
+  if (isInteractiveTarget(event.target)) {
+    return;
+  }
+
+  if (gameOver) {
+    resetGame();
     return;
   }
 
@@ -167,7 +193,7 @@ document.addEventListener("keydown", (event) => {
     event.metaKey ||
     event.altKey ||
     ["Alt", "CapsLock", "Control", "Meta", "Shift", "Tab"].includes(event.key) ||
-    event.target.closest("a, button, textarea, select")
+    isInteractiveTarget(event.target)
   ) {
     return;
   }

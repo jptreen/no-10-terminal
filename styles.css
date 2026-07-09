@@ -16,6 +16,7 @@
 html,
 body {
   min-height: 100%;
+  min-height: 100dvh;
 }
 
 body {
@@ -47,6 +48,7 @@ body::before {
 
 .shell {
   min-height: 100vh;
+  min-height: 100dvh;
   display: block;
   padding: 18px;
 }
@@ -54,6 +56,7 @@ body::before {
 .terminal {
   width: min(calc(100vw - 36px), 980px);
   min-height: min(680px, calc(100vh - 36px));
+  min-height: min(680px, calc(100dvh - 36px));
   margin: 0 auto;
   display: flex;
   flex-direction: column;
@@ -189,6 +192,17 @@ body::before {
   }
 }
 
+@media (prefers-reduced-motion: reduce) {
+  .screen .cursor::after,
+  .better-link {
+    animation: none;
+  }
+
+  .better-link {
+    box-shadow: none;
+  }
+}
+
 @media (max-width: 720px) {
   .shell {
     padding: 10px;
@@ -197,6 +211,7 @@ body::before {
   .terminal {
     width: calc(100vw - 20px);
     min-height: calc(100vh - 20px);
+    min-height: calc(100dvh - 20px);
     padding: 18px;
   }
 
